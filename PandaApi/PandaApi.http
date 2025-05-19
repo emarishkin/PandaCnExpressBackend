@@ -1,0 +1,6 @@
+@PandaApi_HostAddress = http://localhost:5187
+
+GET {{PandaApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
