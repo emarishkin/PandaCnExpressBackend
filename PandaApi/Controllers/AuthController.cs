@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 using PandaApi.Data;
 using PandaApi.Dtos;
 using PandaApi.Models;
@@ -30,7 +31,6 @@ namespace PandaApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            // Проверка: существует ли уже email
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -39,10 +39,8 @@ namespace PandaApi.Controllers
                 return BadRequest("Пользователь с таким email уже существует.");
             }
 
-            // Хеш пароля
             var passwordHash = ComputeSha256Hash(dto.Password);
 
-            // Создание пользователя
             var user = new User
             {
                 Name = dto.Name,
@@ -75,7 +73,6 @@ namespace PandaApi.Controllers
             if (user.PasswordHash != hash)
                 return Unauthorized("Неверный email или пароль");
 
-            // Генерация JWT
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
 
@@ -98,6 +95,34 @@ namespace PandaApi.Controllers
             var jwt = tokenHandler.WriteToken(token);
 
             return Ok(new { token = jwt });
+        }
+
+        // ----------------------
+        // GET /api/auth/me
+        // ----------------------
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await _context.Users.FindAsync(int.Parse(userId));
+            if (user == null)
+                return NotFound();
+
+            return Ok(new
+            {
+                user.Id,
+                user.Name,
+                user.Surname,
+                user.Email,
+                user.Status,
+                user.Phone,
+                user.Country
+            });
         }
 
         // ----------------------

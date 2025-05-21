@@ -13,7 +13,40 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "PandaApi",
+        Version = "v1"
+    });
+
+    var jwtSecurityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        Description = "Введите **Bearer [пробел] ваш JWT токен**",
+
+        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+        {
+            Id = "Bearer",
+            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme
+        }
+    };
+
+    options.AddSecurityDefinition("Bearer", jwtSecurityScheme);
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            jwtSecurityScheme, Array.Empty<string>()
+        }
+    });
+});
+
 
 // 🔐 Настройка JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super_secret_key_123!";
@@ -42,11 +75,10 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseHttpsRedirection();
+app.MapControllers();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 app.Run();
