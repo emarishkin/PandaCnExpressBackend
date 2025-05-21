@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PandaApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+248a47f2fb90c9acd5373b388773e8bb15d3dac0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bc97dfe2eb67cbb7212f54c7d96810773e5a5e3")]
 [assembly: System.Reflection.AssemblyProductAttribute("PandaApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PandaApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
