@@ -69,6 +69,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()    // можно ограничить на проде
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -76,6 +86,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.MapControllers();
 
 app.UseAuthentication();
